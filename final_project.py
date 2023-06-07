@@ -32,13 +32,13 @@ print('token id: ', tokenizer.convert_tokens_to_ids(tokenizer.tokenize(tweets[0]
 #put data into correct shape for BERT
 input_ids = []
 for tweet in tweets:
-    #map tweets to token ids after adding special tokens
+    #map "tweets" to token ids after adding special tokens
     encoded_sent = tokenizer.encode(
         tweet,
-        add_special_tokens=True,  #add special tokens '[CLS]' and '[SEP]'
+        add_special_tokens=True,  #add special tokens '[CLS]' and '[SEP]' so BERT can read "tweets"
     )
     input_ids.append(encoded_sent)
-#pad/truncate
+#pad/truncate to make each "tweet" a fixed length
 from keras.utils import pad_sequences
 MAX_LEN = 128
 input_ids = pad_sequences(input_ids, maxlen=MAX_LEN , truncating="post", padding="post")
