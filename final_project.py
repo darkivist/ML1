@@ -32,10 +32,10 @@ print('token id: ', tokenizer.convert_tokens_to_ids(tokenizer.tokenize(tweets[0]
 #put data into correct shape for BERT
 input_ids = []
 for tweet in tweets:
-    # so basically encode tokenizing , mapping sentences to thier token ids after adding special tokens.
+    #map tweets to token ids after adding special tokens
     encoded_sent = tokenizer.encode(
-        tweet,  # tweet which are encoding.
-        add_special_tokens=True,  # Adding special tokens '[CLS]' and '[SEP]'
+        tweet,
+        add_special_tokens=True,  #add special tokens '[CLS]' and '[SEP]'
     )
     input_ids.append(encoded_sent)
 #pad/truncate
@@ -45,9 +45,9 @@ input_ids = pad_sequences(input_ids, maxlen=MAX_LEN , truncating="post", padding
 #ensure model focuses on data and not padding
 attention_masks = []
 for tweet in input_ids:
-    # Generating attention mask for sentences.
-    #   - when there is 0 present as token id we are going to set mask as 0.
-    #   - we are going to set mask 1 for all non-zero positive input id.
+    #generate attention mask for tweets
+    #when token id is 0 set mask as 0.
+    #when input id is non-zero set mask as 1
     att_mask = [int(token_id > 0) for token_id in tweet]
     attention_masks.append(att_mask)
 #training/validation split
