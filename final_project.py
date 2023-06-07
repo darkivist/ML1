@@ -46,7 +46,7 @@ input_ids = pad_sequences(input_ids, maxlen=MAX_LEN , truncating="post", padding
 attention_masks = []
 for tweet in input_ids:
     #generate attention mask for tweets
-    #when token id is 0 set mask as 0.
+    #when token id is 0 set mask as 0
     #when input id is non-zero set mask as 1
     att_mask = [int(token_id > 0) for token_id in tweet]
     attention_masks.append(att_mask)
