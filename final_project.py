@@ -4,6 +4,7 @@
 #tokenizer: https://www.techtarget.com/searchenterpriseai/definition/BERT-language-model
 import pandas as pd
 from transformers import BertTokenizer
+import torch
 import keras
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
 
@@ -55,4 +56,14 @@ from sklearn.model_selection import train_test_split
 train_inputs, validation_inputs, train_labels, validation_labels = train_test_split(input_ids, disaster_value, test_size=0.2)
 train_masks, validation_masks, _, _ = train_test_split(attention_masks, disaster_value,test_size=0.1)
 
+from transformers import BertForSequenceClassification, AdamW, BertConfig
 
+model = BertForSequenceClassification.from_pretrained(
+    "bert-base-uncased",
+    num_labels = 2,
+    output_attentions = False,
+    output_hidden_states = False,
+)
+
+#run model on cpu (try gpu later)
+model.cpu()
