@@ -4,9 +4,16 @@
 #tokenizer: https://www.techtarget.com/searchenterpriseai/definition/BERT-language-model
 import pandas as pd
 from transformers import BertTokenizer
-import torch
-import keras
+import tensorflow as tf
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
+from transformers import TFBertForSequenceClassification
+
+
+model = TFBertForSequenceClassification.from_pretrained("bert-base-uncased")
+
+#run the model on cpu.
+#model.cpu()
+
 
 #read in data
 training_orig = pd.read_csv("data/train.csv")
@@ -30,40 +37,18 @@ print('tokenized: ', tokenizer.tokenize(tweets[0]))
 #print tweet mapped to tokenized tweet
 print('token id: ', tokenizer.convert_tokens_to_ids(tokenizer.tokenize(tweets[0])))
 #the above shows we either need to use a tokenizer that gets rid of hashtags, etc., or we need to do more preprocessing before tokenizing
-#put data into correct shape for BERT
-input_ids = []
-for tweet in tweets:
-    #map "tweets" to token ids after adding special tokens
-    encoded_tweet = tokenizer.encode(
-        tweet,
-        add_special_tokens=True,  #add special tokens '[CLS]' and '[SEP]' so BERT can read "tweets"
-    )
-    input_ids.append(encoded_tweet)
-#pad/truncate to make each "tweet" a fixed length
-from keras.utils import pad_sequences
-MAX_LEN = 128
-input_ids = pad_sequences(input_ids, maxlen=MAX_LEN , truncating="post", padding="post")
-#ensure model focuses on data and not padding
-attention_masks = []
-for tweet in input_ids:
-    #generate attention mask for tweets
-    #when token id is 0 set mask as 0
-    #when input id is non-zero set mask as 1
-    att_mask = [int(token_id > 0) for token_id in tweet]
-    attention_masks.append(att_mask)
-#training/validation split
-from sklearn.model_selection import train_test_split
-train_inputs, validation_inputs, train_labels, validation_labels = train_test_split(input_ids, disaster_value, test_size=0.2)
-train_masks, validation_masks, _, _ = train_test_split(attention_masks, disaster_value,test_size=0.1)
 
-from transformers import BertForSequenceClassification, AdamW, BertConfig
+train_x = tokenizer.batch_encode_plus(tweets, pad_to_max_length=True, return_tensors="tf")
+train_y = training_work['target'].to_numpy()
+#train_y = disaster_values.to_numpy()
+print(train_x)
 
-model = BertForSequenceClassification.from_pretrained(
-    "bert-base-uncased",
-    num_labels = 2,
-    output_attentions = False,
-    output_hidden_states = False,
-)
+#optimize
 
-#run model on cpu (try gpu later)
-model.cpu()
+optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
+loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+bce = tf.keras.losses.BinaryCrossentropy()
+metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
+
+model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
+model.fit(x=train_x['input_ids'], y=train_y, epochs=15, batch_size=128, verbose=1)
