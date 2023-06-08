@@ -53,3 +53,6 @@ metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 model.fit(x=train_x['input_ids'], y=train_y, epochs=2, batch_size=15, verbose=1)
 #this resulted in loss: 0.3146 - accuracy: 0.8760
+
+#next - maybe amend the above to utilize a train/validation split, re-run model
+#next next - read in test data, prep as with train, run prediction
