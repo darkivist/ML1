@@ -3,13 +3,13 @@
 #importing libraries and tokenizers
 #tokenizer: https://www.techtarget.com/searchenterpriseai/definition/BERT-language-model
 import pandas as pd
-from transformers import BertTokenizer
+from transformers import BertTokenizer, DistilBertTokenizer, TFDistilBertForSequenceClassification
 import tensorflow as tf
-tokenizer = BertTokenizer.from_pretrained('bert-base-uncased', do_lower_case=True)
-from transformers import TFBertForSequenceClassification
 
+#switched from BertTokenizer and TFBertForSequenceClassification to DistilBert because it was taking hours locally and maxing out Google Colab RAM
 
-model = TFBertForSequenceClassification.from_pretrained("bert-base-uncased")
+tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased', do_lower_case=True)
+model = TFDistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased')
 
 #run the model on cpu.
 #model.cpu()
@@ -51,4 +51,4 @@ bce = tf.keras.losses.BinaryCrossentropy()
 metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-model.fit(x=train_x['input_ids'], y=train_y, epochs=15, batch_size=128, verbose=1)
+model.fit(x=train_x['input_ids'], y=train_y, epochs=2, batch_size=15, verbose=1)
