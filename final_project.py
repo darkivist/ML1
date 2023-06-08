@@ -49,6 +49,7 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
 metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
-
+#previously had more epochs, but reduced iterations as per official guidance from BERT's documentation and also it was taking forever
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 model.fit(x=train_x['input_ids'], y=train_y, epochs=2, batch_size=15, verbose=1)
+#this resulted in loss: 0.3146 - accuracy: 0.8760
