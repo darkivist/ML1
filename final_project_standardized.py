@@ -90,7 +90,7 @@ metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 #compile and train model on training data
 #do we need to add random seed to model.fit or am I misremembering?
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=1)
+model.fit(x=X_train['input_ids'], y=y_train, epochs=2, validation_data=(X_val,y_val), batch_size=15, verbose=1)
 #epochs 2, batch size 15 resulted in loss: 0.3146 - accuracy: 0.8760
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
