@@ -1,7 +1,7 @@
 #pip install torch, transformers, datasets, tensorflow, flax, keras, sklearn before running
 #add code citations
 
-#importing libraries
+#import libraries
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
