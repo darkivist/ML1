@@ -44,6 +44,8 @@ print('token id: ', tokenizer.convert_tokens_to_ids(tokenizer.tokenize(tweets[0]
 #the above shows we either need to use a tokenizer that gets rid of hashtags, etc...
 # ...or we need to do more preprocessing before tokenizing...
 #... OR do we not drop '#' because a hashtag might indicate a disaster event?
+#train/val split
+
 #preprocessing
 train_x = tokenizer.batch_encode_plus(tweets, pad_to_max_length=True, return_tensors="tf")
 train_y = training_work['target'].to_numpy()
