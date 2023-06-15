@@ -15,6 +15,15 @@ model = TFDistilBertForSequenceClassification.from_pretrained('distilbert-base-u
 #... because it was taking hours locally (eventually crashed my computer)...
 #... and maxing out free Google Colab RAM. Now it takes about 30 minutes locally and 2 hours in Colab.
 
+#random seed
+random_seed = 42
+
+#set random seed in tensorflow
+tf.random.set_seed(random_seed)
+
+#set random seed in numpy
+np.random.seed(random_seed)
+
 #load the raw training data
 df_raw_train = pd.read_csv("data/train.csv")
 #make a copy of df_raw_train
