@@ -15,15 +15,6 @@ model = TFDistilBertForSequenceClassification.from_pretrained('distilbert-base-u
 #... because it was taking hours locally (eventually crashed my computer)...
 #... and maxing out free Google Colab RAM. Now it takes about 30 minutes locally and 2 hours in Colab.
 
-#random seed
-random_seed = 42
-
-#set random seed in tensorflow
-tf.random.set_seed(random_seed)
-
-#set random seed in numpy
-np.random.seed(random_seed)
-
 #load the raw training data
 df_raw_train = pd.read_csv("data/train.csv")
 #make a copy of df_raw_train
@@ -88,17 +79,12 @@ bce = tf.keras.losses.BinaryCrossentropy()
 metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 
 #compile and train model on training data
-#do we need to add random seed to model.fit or am I misremembering?
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 model.fit(x=X_train['input_ids'], y=y_train, epochs=2, validation_data=(X_val,y_val), batch_size=15, verbose=1)
 #epochs 2, batch size 15 resulted in loss: 0.3146 - accuracy: 0.8760
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
 #fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
-
-#compile and train model on validation data - how can we take what was learned in the initial training and feed it into here?
-#model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-#model.fit(x=X_val['input_ids'], y=y_val, epochs=2, batch_size=15, verbose=1)
 
 #predict
 predictions = model.predict(X_test['input_ids'])
