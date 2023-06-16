@@ -85,11 +85,14 @@ y_val = df_val['target'].to_numpy()
 optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
-metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
+metric = tf.keras.metrics.SparseCategoricalAccuracy() #is this label the reason val isn't showing up in epochs?
 
 #compile and train model on training data
-model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-model.fit(x=X_train['input_ids'], y=y_train, epochs=2, validation_data=(X_val,y_val), batch_size=15, verbose=1)
+#add something to show val_loss and val_acc here, to compare to train loss and acc?
+#https://stackoverflow.com/questions/46308374/what-is-validation-data-used-for-in-a-keras-sequential-model
+model.compile(optimizer=optimizer, loss=loss, metrics=metric)
+history = model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, validation_data=(X_val, y_val))
+print(history)
 #epochs 2, batch size 15 resulted in loss: 0.3146 - accuracy: 0.8760
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
