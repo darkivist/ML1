@@ -62,17 +62,15 @@ df_test.head()
 
 #batch tokenize our tweet field
 X_train = tokenizer.batch_encode_plus(df_train.text, pad_to_max_length=True, return_tensors="tf")
-#X_val = tokenizer.batch_encode_plus(df_val.text, pad_to_max_length=True, return_tensors="tf")
 X_test = tokenizer.batch_encode_plus(df_test.text, pad_to_max_length=True, return_tensors="tf")
 
 #obtain target
 y_train = df_train['target'].to_numpy()
-#y_val = df_val['target'].to_numpy()
-#y_val = np_utils.to_categorical(y_val)
 
 #optimize model
 #fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
 optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
+#try AdamW? https://towardsdatascience.com/why-adamw-matters-736223f31b5d
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
 metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
