@@ -93,7 +93,6 @@ metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 #https://stackoverflow.com/questions/46308374/what-is-validation-data-used-for-in-a-keras-sequential-model
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 history = model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=2, validation_split=0.2)
-#epochs 2, batch size 15 resulted in loss: 0.3146 - accuracy: 0.8760
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
 #fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
@@ -110,6 +109,13 @@ plt.xlabel('epoch')
 plt.legend(['train', 'val'], loc='upper left')
 plt.show
 
+#add plot to show val_accuracy compared to train accuracy.
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
 
 #predict
 predictions = model.predict(X_test['input_ids'])
