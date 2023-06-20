@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from transformers import DistilBertTokenizer, TFDistilBertForSequenceClassification
 import tensorflow as tf
+#import np_utils
 
 #import tokenizer and pre-trained model
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased', do_lower_case=True)
@@ -80,19 +81,19 @@ X_test = tokenizer.batch_encode_plus(df_test.text, pad_to_max_length=True, retur
 #obtain target
 y_train = df_train['target'].to_numpy()
 y_val = df_val['target'].to_numpy()
+#y_val = np_utils.to_categorical(y_val)
 
 #optimize model
 optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
-metric = tf.keras.metrics.SparseCategoricalAccuracy() #is this label the reason val isn't showing up in epochs?
+metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy') #is this label the reason val isn't showing up in epochs?
 
 #compile and train model on training data
 #add something to show val_loss and val_acc here, to compare to train loss and acc?
 #https://stackoverflow.com/questions/46308374/what-is-validation-data-used-for-in-a-keras-sequential-model
-model.compile(optimizer=optimizer, loss=loss, metrics=metric)
-history = model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, validation_data=(X_val, y_val))
-print(history)
+model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
+model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=2, validation_split=0.2)
 #epochs 2, batch size 15 resulted in loss: 0.3146 - accuracy: 0.8760
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
