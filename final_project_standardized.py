@@ -1,4 +1,4 @@
-#pip install torch, transformers, datasets, tensorflow, flax, keras, sklearn before running
+#pip install torch, transformers, datasets, tensorflow, flax, keras before running
 #add code citations
 
 #import libraries
@@ -60,19 +60,6 @@ df_train.head()
 #print head of df_test to ensure dropping worked correctly
 df_test.head()
 
-#training (80%) and validation (20%) data split
-
-#df_train, df_val = train_test_split(df_train, train_size=0.8, random_state=random_seed)
-
-#reset index
-#df_train, df_val = df_train.reset_index(drop=True), df_val.reset_index(drop=True)
-
-#print shape of df_train
-#pd.DataFrame([[df_train.shape[0], df_train.shape[1]]], columns=['# rows', '# columns'])
-
-#print shape of df_val
-#pd.DataFrame([[df_val.shape[0], df_val.shape[1]]], columns=['# rows', '# columns'])
-
 #batch tokenize our tweet field
 X_train = tokenizer.batch_encode_plus(df_train.text, pad_to_max_length=True, return_tensors="tf")
 #X_val = tokenizer.batch_encode_plus(df_val.text, pad_to_max_length=True, return_tensors="tf")
@@ -84,6 +71,7 @@ y_train = df_train['target'].to_numpy()
 #y_val = np_utils.to_categorical(y_val)
 
 #optimize model
+#fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
 optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
@@ -95,7 +83,6 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 history = model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=2, validation_split=0.2)
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
-#fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
 
 #evaluate
 #add plot to show val_loss compared to train loss
@@ -124,4 +111,3 @@ predictions_label = [np.argmax(x) for x in predictions[0]]
 results = pd.DataFrame({'id': df_raw_test['id'], 'target': predictions_label})
 results['target'] = results['target'].astype('int')
 results.to_csv('predictions.csv', index=False)
-#profit!
