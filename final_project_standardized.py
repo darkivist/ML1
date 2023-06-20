@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from transformers import DistilBertTokenizer, TFDistilBertForSequenceClassification
 import tensorflow as tf
-#import np_utils
+import matplotlib.pyplot as plt
 
 #import tokenizer and pre-trained model
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased', do_lower_case=True)
@@ -62,42 +62,54 @@ df_test.head()
 
 #training (80%) and validation (20%) data split
 
-df_train, df_val = train_test_split(df_train, train_size=0.8, random_state=random_seed)
+#df_train, df_val = train_test_split(df_train, train_size=0.8, random_state=random_seed)
 
 #reset index
-df_train, df_val = df_train.reset_index(drop=True), df_val.reset_index(drop=True)
+#df_train, df_val = df_train.reset_index(drop=True), df_val.reset_index(drop=True)
 
 #print shape of df_train
-pd.DataFrame([[df_train.shape[0], df_train.shape[1]]], columns=['# rows', '# columns'])
+#pd.DataFrame([[df_train.shape[0], df_train.shape[1]]], columns=['# rows', '# columns'])
 
 #print shape of df_val
-pd.DataFrame([[df_val.shape[0], df_val.shape[1]]], columns=['# rows', '# columns'])
+#pd.DataFrame([[df_val.shape[0], df_val.shape[1]]], columns=['# rows', '# columns'])
 
 #batch tokenize our tweet field
 X_train = tokenizer.batch_encode_plus(df_train.text, pad_to_max_length=True, return_tensors="tf")
-X_val = tokenizer.batch_encode_plus(df_val.text, pad_to_max_length=True, return_tensors="tf")
+#X_val = tokenizer.batch_encode_plus(df_val.text, pad_to_max_length=True, return_tensors="tf")
 X_test = tokenizer.batch_encode_plus(df_test.text, pad_to_max_length=True, return_tensors="tf")
 
 #obtain target
 y_train = df_train['target'].to_numpy()
-y_val = df_val['target'].to_numpy()
+#y_val = df_val['target'].to_numpy()
 #y_val = np_utils.to_categorical(y_val)
 
 #optimize model
 optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
-metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy') #is this label the reason val isn't showing up in epochs?
+metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
 
 #compile and train model on training data
-#add something to show val_loss and val_acc here, to compare to train loss and acc?
 #https://stackoverflow.com/questions/46308374/what-is-validation-data-used-for-in-a-keras-sequential-model
 model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
-model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=2, validation_split=0.2)
+history = model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=2, validation_split=0.2)
 #epochs 2, batch size 15 resulted in loss: 0.3146 - accuracy: 0.8760
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
 #fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
+
+#evaluate
+#add plot to show val_loss compared to train loss
+
+history.history
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'val'], loc='upper left')
+plt.show
+
 
 #predict
 predictions = model.predict(X_test['input_ids'])
