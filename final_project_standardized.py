@@ -70,7 +70,7 @@ y_train = df_train['target'].to_numpy()
 #optimize model
 #fine tune parameters? https://github.com/uzaymacar/comparatively-finetuning-bert
 optimizer = tf.keras.optimizers.Adam(learning_rate=3e-5, epsilon=1e-08, clipnorm=1.0)
-#try AdamW? https://towardsdatascience.com/why-adamw-matters-736223f31b5d
+#try AdamW? https://towardsdatascience.com/why-adamw-matters-736223f31b5d NO IT PERFORMED WORSE
 loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
 bce = tf.keras.losses.BinaryCrossentropy()
 metric = tf.keras.metrics.SparseCategoricalAccuracy('accuracy')
@@ -81,7 +81,7 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[metric])
 history = model.fit(x=X_train['input_ids'], y=y_train, epochs=2, batch_size=15, verbose=2, validation_split=0.2)
 #previously had more epochs, but reduced iterations as per official guidance from BERT's documentation...
 #... (and also it was taking forever)
-
+#add model.summary?
 #evaluate
 #add plot to show val_loss compared to train loss
 
